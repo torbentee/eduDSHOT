@@ -67,7 +67,7 @@ resources:
         - name: db_user
         - name: db_password
       group: script
-      config: { get_file: "https://raw.githubusercontent.com/torbentee/eduDScloud/master/hot-templates/db-ubuntu-install.sh?***REMOVED***" }
+      config: { get_file: "https://raw.githubusercontent.com/torbentee/eduDSHOT/master/scripts/db-ubuntu-install.sh" }
 
   db_root_password:
     type: OS::Heat::RandomString

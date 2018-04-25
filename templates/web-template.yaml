@@ -72,7 +72,7 @@ resources:
     type: OS::Heat::SoftwareConfig
     properties:
       group: script
-      config: { get_file: "https://raw.githubusercontent.com/torbentee/eduDScloud/master/hot-templates/db-ubuntu-install.sh?***REMOVED***" }
+      config: { get_file: "https://raw.githubusercontent.com/torbentee/eduDSHOT/master/scripts/django.sh" }
 
   db_deployment:
     type: OS::Heat::SoftwareDeployment
