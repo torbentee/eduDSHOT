@@ -71,6 +71,11 @@ resources:
   web_config:
     type: OS::Heat::SoftwareConfig
     properties:
+      inputs:
+        - name: db_ipaddress
+        - name: db_name
+        - name: db_user
+        - name: db_password
       group: script
       config: { get_file: "https://raw.githubusercontent.com/torbentee/eduDSHOT/master/scripts/django.sh" }
 
@@ -83,8 +88,9 @@ resources:
         get_resource: web_instance
       input_values:
         db_name: { get_param: db_name }
+	db_user: { get_param: db_user }
         db_password: { get_attr: [ db_password, value ] }
-        db_ipaddr: { get_attr: [ db_ipaddress, value ] }
+        db_ipaddr: { get_attr: db_ipaddress  }
 
   web_instance:
     type: OS::Nova::Server
