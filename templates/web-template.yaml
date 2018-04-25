@@ -1,0 +1,107 @@
+heat_template_version: 2013-05-23
+
+description: >
+  Heat MariaDB template to deploy on a single instance using Heat's
+  software orchestration feature.
+  Version with tested
+
+parameters:
+  key_name:
+    type: string
+    description: Name of a key pair to enable SSH access to instances.
+    default: testkey
+  flavor:
+    type: string
+    description: Flavor to use for the DB-server.
+    constraints:
+      - custom_constraint: nova.flavor
+  image:
+    type: string
+    description: >
+      Name or ID of the image to use for the DB-server.
+      ubuntu-16.04-server-cloudimg-i386-disk1.img
+      img file of ubuntu is Qcow2 compatible
+    default: ubuntu-hook
+
+  network_connection:
+    type: string
+    description: Network to connect to.
+
+
+  db_ipaddress:
+    type: string
+    decription: >
+      IP of the Database server to Connect to.
+
+  db_name:
+    type: string
+    description: Django database name, used in DB template
+    constraints:
+      - length: { min: 1, max: 64 }
+        description: db_name must be between 1 and 64 characters
+      - allowed_pattern: '[a-zA-Z][a-zA-Z0-9]*'
+        description: >
+          db_name must begin with a letter and contain only alphanumeric
+          characters
+
+  db_username:
+    type: string
+    description: The Django database admin account username used in DB-template
+    hidden: true
+    constraints:
+      - length: { min: 1, max: 16 }
+        description: db_username must be between 1 and 64 characters
+      - allowed_pattern: '[a-zA-Z][a-zA-Z0-9]*'
+        description: >
+          db_username must begin with a letter and contain only alphanumeric
+          characters
+
+  db_password:
+    type: string
+    description: The Django database admin account username used in DB-template
+    constraints:
+      - length: { min: 8, max: 64 }
+        description: db_password must be between 8 and 64 characters
+      - allowed_pattern: '[a-zA-Z][a-zA-Z0-9]*'
+        description: >
+          db_password must begin with a letter and contain only alphanumeric
+          characters
+
+resources:
+  web_config:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: script
+      config: { get_file: "https://raw.githubusercontent.com/torbentee/eduDScloud/master/hot-templates/db-ubuntu-install.sh?***REMOVED***" }
+
+  db_deployment:
+    type: OS::Heat::SoftwareDeployment
+    properties:
+      config:
+        get_resource: web_config
+      server:
+        get_resource: web_instance
+      input_values:
+        db_name: { get_param: db_name }
+        db_password: { get_attr: [ db_password, value ] }
+        db_ipaddr: { get_attr: [ db_ipaddress, value ] }
+
+  web_instance:
+    type: OS::Nova::Server
+    properties:
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      key_name: { get_param: key_name }
+      user_data_format: SOFTWARE_CONFIG
+      networks:
+        - network: { get_param: network_connection }
+
+outputs:
+  WebsiteURL:
+    description: URL for Wordpress wiki
+    value:
+      str_replace:
+        template: http://host/wordpress
+        params:
+          host: { get_attr: [db_instance, networks, private, 0] }
+
