@@ -23,14 +23,14 @@ parameters:
       img file of ubuntu is Qcow2 compatible
     default: ubuntu-hook
 
-  network_connection:
+  network:
     type: string
     description: Network to connect to.
 
 
   db_ipaddress:
     type: string
-    decription: >
+    description: >
       IP of the Database server to Connect to.
 
   db_name:
@@ -47,7 +47,6 @@ parameters:
   db_username:
     type: string
     description: The Django database admin account username used in DB-template
-    hidden: true
     constraints:
       - length: { min: 1, max: 16 }
         description: db_username must be between 1 and 64 characters
@@ -88,9 +87,9 @@ resources:
         get_resource: web_instance
       input_values:
         db_name: { get_param: db_name }
-	db_user: { get_param: db_user }
-        db_password: { get_attr: [ db_password, value ] }
-        db_ipaddr: { get_attr: db_ipaddress  }
+        db_user: { get_param: db_username }
+        db_password: { get_param:  db_password }
+        db_ipaddr: { get_param: db_ipaddress  }
 
   web_instance:
     type: OS::Nova::Server
@@ -100,14 +99,14 @@ resources:
       key_name: { get_param: key_name }
       user_data_format: SOFTWARE_CONFIG
       networks:
-        - network: { get_param: network_connection }
+        - network: { get_param: network }
 
 outputs:
   WebsiteURL:
-    description: URL for Wordpress wiki
+    description: URL for Djange
     value:
       str_replace:
         template: http://host/wordpress
         params:
-          host: { get_attr: [db_instance, networks, private, 0] }
+          host: { get_attr: [web_instance, networks, private, 0] }
 

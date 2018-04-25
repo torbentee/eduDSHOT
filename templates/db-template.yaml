@@ -36,8 +36,7 @@ parameters:
   db_username:
     type: string
     description: The WordPress database admin account username
-    default: admin
-    hidden: true
+    default: dbuser
     constraints:
       - length: { min: 1, max: 16 }
         description: db_username must be between 1 and 64 characters
@@ -48,7 +47,6 @@ parameters:
   db_password:
     type: string
     description: The WordPress database admin account username
-    default: OS::Heat::RandomString
     constraints:
       - length: { min: 8, max: 64 }
         description: db_password must be between 8 and 64 characters
@@ -56,6 +54,10 @@ parameters:
         description: >
           db_password must begin with a letter and contain only alphanumeric
           characters
+
+  network:
+    type: string
+    description: Network to connect to.
 
 resources:
   db_config:
@@ -84,7 +86,7 @@ resources:
         db_rootpassword: { get_attr: [ db_root_password, value ] }
         db_name: { get_param: db_name }
         db_user: { get_param: db_username }
-        db_password: { get_attr: [ db_password, value ] }
+        db_password: { get_param: db_password }
         db_ipaddr: { get_attr: [ db_instance, networks, private, 0 ] }
 
   db_instance:
@@ -95,15 +97,6 @@ resources:
       key_name: { get_param: key_name }
       user_data_format: SOFTWARE_CONFIG
       networks:
-        - network: private_network
+        - network: { get_param: network }
 
-
-outputs:
-  WebsiteURL:
-    description: URL for Wordpress wiki
-    value:
-      str_replace:
-        template: http://host/wordpress
-        params:
-          host: { get_attr: [db_instance, networks, private, 0] }
 

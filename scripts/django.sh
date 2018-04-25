@@ -1,5 +1,5 @@
 #!/bin/bash -v
-
+sudo apt update
 sudo apt install -y python python-pip mysql-client libmysqlclient-dev crudini
 cd /home/ubuntu
 git clone https://github.com/torbentee/eduDSExample.git
