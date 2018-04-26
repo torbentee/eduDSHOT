@@ -15,3 +15,21 @@ sudo pip install -r requirements.txt
 sudo python manage.py makemigrations
 sudo python manage.py migrate
 
+sudo su
+cat << EOF >> /etc/systemd/system/django.service
+[Unit]
+Description=Django webapp start script
+
+[Service]
+Environment="PATH=/home/ubuntu/eduDSExample:/usr/bin"
+ExecStart=/usr/bin/python /home/ubuntu/eduDSExample/manage.py runserver 0.0.0.0:8000
+Type=simple
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+exit
+
+sudo systemctl daemon-reload
+sudo systemctl enable django.service
