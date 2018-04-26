@@ -15,3 +15,4 @@ IDENTIFIED BY '$db_password';
 FLUSH PRIVILEGES;
 EXIT
 EOF
+sudo service mysql restart

@@ -89,7 +89,7 @@ resources:
         db_name: { get_param: db_name }
         db_user: { get_param: db_username }
         db_password: { get_param:  db_password }
-        db_ipaddr: { get_param: db_ipaddress  }
+        db_ipaddress: { get_param: db_ipaddress  }
 
   web_instance:
     type: OS::Nova::Server
