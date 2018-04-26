@@ -29,7 +29,6 @@ RemainAfterExit=yes
 [Install]
 WantedBy=multi-user.target
 EOF
-exit
 
 sudo systemctl daemon-reload
 sudo systemctl enable django.service
