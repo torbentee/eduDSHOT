@@ -15,7 +15,6 @@ sudo pip install -r requirements.txt
 sudo python manage.py makemigrations
 sudo python manage.py migrate
 
-sudo su
 cat << EOF >> /etc/systemd/system/django.service
 [Unit]
 Description=Django webapp start script
@@ -29,6 +28,6 @@ RemainAfterExit=yes
 [Install]
 WantedBy=multi-user.target
 EOF
-
 sudo systemctl daemon-reload
 sudo systemctl enable django.service
+sudo systemctl start django
