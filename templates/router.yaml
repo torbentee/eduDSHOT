@@ -1,0 +1,62 @@
+description: 'Router test'
+heat_template_version: '2013-05-23'
+outputs: null
+parameters:
+  ip_pool_end: {description: End Ip of Pool., type: string}
+  ip_pool_start: {description: Start Ip of Pool., type: string}
+  network_name: {description: Name of the Network and Subnet., type: string}
+  route_dest: {description: destination network, type: string}
+  route_hop: {description: next hop ip, type: string}
+  router_ip: {description: subnet router ip., type: string}
+  shared_net_name: {description: Name of the Shared Subnet., type: string}
+  subnet_ip: {description: IP Network., type: string}
+  subnet_ip_mask: {description: Network ip with networkmask 0.0.0.0/24., type: string}
+  subnet_name: {description: Name of the Subnetwork., type: string}
+resources:
+  network:
+    properties:
+      admin_state_up: 'true'
+      name: {get_param: network_name}
+      port_security_enabled: 'false'
+      shared: 'false'
+    type: OS::Neutron::Net
+  router:
+    properties: {admin_state_up: 'true', distributed: 'true', ha: 'false', name: test}
+    type: OS::Neutron::Router
+  subnet:
+    properties:
+      allocation_pools:
+      - end: {get_param: ip_pool_end}
+        start: {get_param: ip_pool_start}
+      cidr: {get_param: subnet_ip_mask}
+      dns_nameservers: [10.0.31.1]
+      enable_dhcp: 'true'
+      gateway_ip: 10.205.0.1
+      host_routes:
+      - destination: {get_param: route_dest}
+        nexthop: {get_param: route_hop}
+      ip_version: 4
+      name: {get_param: subnet_name}
+      network: {get_param: network_name}
+    type: OS::Neutron::Subnet
+  subnetport:
+    properties:
+      admin_state_up: 'true'
+      device_id: {get_resource: router}
+      device_owner: network:router_interface_distributed
+      fixed_ips:
+      - ip_address: {get_param: router_ip}
+        subnet_id: {get_resource: subnet}
+      name: ''
+      network: {get_param: network_name}
+      port_security_enabled: 'false'
+    type: OS::Neutron::Port
+  subnetport_shared:
+    properties:
+      admin_state_up: 'true'
+      device_id: {get_resource: router}
+      device_owner: network:router_interface_distributed
+      name: ''
+      network: {get_param: shared_net_name}
+      port_security_enabled: 'false'
+    type: OS::Neutron::Port
